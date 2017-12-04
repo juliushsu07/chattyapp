@@ -13,7 +13,7 @@ Chatty allows users to communicate with each other without having to register ac
 
 ### Usage
 
-```
+
 clone this repository
 
 Install the dependencies and start the server.
@@ -21,8 +21,12 @@ Install the dependencies and start the server.
 ```
 npm install
 npm start
-open http://localhost:3000
 ```
+then open the broswer and go to
+```
+http://localhost:3000
+```
+
 
 ### Dependencies
 
