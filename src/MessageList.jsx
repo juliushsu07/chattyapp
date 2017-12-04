@@ -8,13 +8,20 @@ console.log("Rendering <MessageList/>");
 class MessageList extends Component {
 
   render(){
-    const message = this.props.messages.map( (message) =>
-      <Message username = {message.username} content = {message.content} key = {message.id} />
-    );
 
     return (
       <main className="messages">
-        {message}
+         {this.props.messages.map((message) => {
+          if (message.type === "incomingMessage") {
+            return (
+              <Message username = {message.username} content = {message.content} key = {message.id}/>
+            );
+          } else {
+            return (
+              <div key={message.id} className="message system">{message.content}</div>
+            );
+          }
+        })}
       </main>
     );
   }

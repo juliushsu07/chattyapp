@@ -20,23 +20,59 @@ const wss = new SocketServer({ server });
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
 
-wss.broadcast = function broadcast(data) {
+
+
+const broadcast = function broadcast(data) {
   wss.clients.forEach(function each(client) {
     client.send(data);
   });
 };
 
+let counter = 0;
+let oldUsername = "";
+
+const subtractUserCounter = () => {
+  counter--;
+  let res = {
+    type: "incomingUserCounter",
+    userCounter: counter
+  }
+  broadcast(JSON.stringify(res));
+}
+
 wss.on('connection', (ws) => {
   console.log('Client connected');
+  // addUserCounter()
 
   ws.on('message', (data) => {
-    incomingMessage = JSON.parse(data);
-    incomingMessage.id = uuidv1();
+    const res = JSON.parse(data);
+    res.id = uuidv1();
 
-    wss.broadcast(JSON.stringify(incomingMessage));
-
+    switch(res.type) {
+      case "initializeUser":
+        res.type = "incomingUserCounter";
+        counter = counter +1;
+        res.userCounter= counter;
+        oldUsername = res.oldUsername;
+      break;
+      case "postMessage":
+        // handle incoming message
+        res.type = "incomingMessage";
+        break;
+      case "postNotification":
+        // handle incoming notification
+        res.type ="incomingNotification";
+        res.content = `${oldUsername} ${res.content} ${res.newUsername}`;
+        oldUsername = res.newUsername;
+        break;
+      }
+      broadcast(JSON.stringify(res));
   });
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-  ws.on('close', () => console.log('Client disconnected'));
+  ws.on('close', () => {
+    console.log('Client disconnected');
+    subtractUserCounter();
+  });
 });
+

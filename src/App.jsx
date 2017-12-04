@@ -4,9 +4,6 @@ import ChatBar from './ChatBar.jsx';
 import MessageList from './MessageList.jsx';
 
 
-
-
-
 console.log("Rendering <App/>");
 class App extends Component {
   constructor(props) {
@@ -14,35 +11,76 @@ class App extends Component {
 
     this.state =
     {
-      currentUser: {name: "Bob"},
-      messages: []
+      currentUser: "Anonymous",
+      messages: [],
+      userCounter: 0
     }
 
-    this.addMessage = this.addMessage.bind(this)
+    // this.onUserChangeName = this.onUserChangeName.bind(this);
 
+    this.onUserEnterName = this.onUserEnterName.bind(this);
+    this.onEnterMessage = this.onEnterMessage.bind(this);
   }
 
   componentDidMount() {
-    this.socket = new WebSocket("ws://localhost:3001/");
-    this.socket.onopen = function(e){
-       console.log('Connected to server');
+    const initializeUser = {
+        type: "initializeUser",
+        oldUsername: this.state.currentUser,
+        userCounter: this.state.counter
     }
-    this.socket.onmessage = (event) => {
-      const dataFromServer = JSON.parse(event.data);
-      const newMessages = this.state.messages.concat(dataFromServer);
-      this.setState({messages: newMessages});
+    this.socket = new WebSocket("ws://localhost:3001/");
+    this.socket.onopen = (e) => {
+      console.log('connected to server');
+      this.socket.send(JSON.stringify(initializeUser));
+    }
+
+    this.socket.onmessage = (e) => {
+      const data = JSON.parse(event.data);
+
+      switch(data.type) {
+      case "incomingUserCounter":
+        this.setState({userCounter: data.userCounter});
+
+        break;
+      case "incomingMessage":
+        // handle incoming message
+        const newMessages = this.state.messages.concat(data);
+        this.setState({messages: newMessages});
+        break;
+      case "incomingNotification":
+        // handle incoming notification
+        const notificationMsg = this.state.messages.concat(data);
+        this.setState({messages: notificationMsg});
+        break;
+      default:
+        // show an error in the console if the message type is unknown
+        throw new Error("Unknown event type " + data.type);
+      }
+
     }
   }
 
-  addMessage(e) {
+  onUserEnterName(e){
+     if(e.key === 'Enter'){
+      const changeNameMsg = {
+        type: "postNotification",
+        newUsername: e.target.value,
+        content: "changed his or her name to"
+      }
+      this.socket.send(JSON.stringify(changeNameMsg));
+      this.setState({currentUser: e.target.value});
+    }
+  }
+
+  onEnterMessage(e) {
     if(e.key === 'Enter'){
-      const newMessage = {
-        id: this.state.messages.length + 1,
-        username: this.state.currentUser.name ,
+      const newMessages = {
+        type: "postMessage",
+        username: this.state.currentUser ,
         content: e.target.value
       }
-      const message = JSON.stringify(newMessage);
-      this.socket.send(message);
+      this.socket.send(JSON.stringify(newMessages));
+      e.target.value = "";
     }
   }
 
@@ -52,9 +90,10 @@ class App extends Component {
       <div>
         <nav className="navbar">
           <a href="/" className="navbar-brand">Chatty</a>
+          <span className="navbar-counter">{this.state.userCounter} users online</span>
         </nav>
         <MessageList messages = {this.state.messages} />
-        <ChatBar currentUserName = {this.state.currentUser.name} addMessage = {this.addMessage}/>
+        <ChatBar currentUser = {this.state.currentUser} onUserEnterName = {this.onUserEnterName} onEnterMessage = {this.onEnterMessage}/>
       </div>
     );
   }
