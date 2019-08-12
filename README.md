@@ -1,6 +1,5 @@
 Chatty App
 =====================
-
 Chatty allows users to communicate with each other without having to register accounts. It uses React, a popular front-end library created and used heavily by Facebook as well as modern tools for Node including Webpack and Babel.
 
 ### Final Product
@@ -12,24 +11,18 @@ Chatty allows users to communicate with each other without having to register ac
 * When the number of connected users changes, this count will be updated for all connected users
 
 ### Usage
-
-
-clone this repository
-
+Clone this repository
 Install the dependencies and start the server.
-
 ```
 npm install
 npm start
 ```
-then open the broswer and go to
+Open the broswer and go to
 ```
 http://localhost:3000
 ```
 
-
 ### Dependencies
-
 * react
 * react-dom
 * webpack
