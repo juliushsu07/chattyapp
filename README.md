@@ -11,10 +11,12 @@ Chatty allows users to communicate with each other without having to register ac
 * When the number of connected users changes, this count will be updated for all connected users
 
 ### Usage
-Clone this repository
-Install the dependencies and start the server.
+Clone this repository and install the dependencies. 
 ```
 npm install
+```
+Start the server.
+```
 npm start
 ```
 Open the broswer and go to
