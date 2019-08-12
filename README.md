@@ -10,7 +10,7 @@ Chatty allows users to communicate with each other without having to register ac
 * Header will display the count of connected users
 * When the number of connected users changes, this count will be updated for all connected users
 
-### Usage
+### Getting Started
 Clone this repository and install the dependencies. 
 ```
 npm install
